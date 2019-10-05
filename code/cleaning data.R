@@ -133,15 +133,7 @@ plot(model,which = 4)
 n=nrow(bodyfat[-c(182,216 ),c(-1,-3)])
 p=ncol(bodyfat[-c(182,216 ),c(-1,-3)])
 abline(h = 4/(n-p),lty=2,col='red')
-#library(car)
-#influencePlot(model)#
-#outlierTest(model,cutoff=Inf, n.max=Inf, order=TRUE)
-#Bonferroni Outlier Test
-#Description
-#Reports the Bonferroni p-values for testing each observation 
-#in turn to be a mean-shift outlier, based Studentized residuals 
-#in linear (t-tests), generalized linear models (normal tests), 
-#and linear mixed models.
+
 
 #we can see the 39 is a influntial point
 outlier=bodyfat[39,]
@@ -159,8 +151,7 @@ layout(matrix(1:1, ncol=1))
 plot(model_2,which = 4)
 n=n-1#delete 39
 abline(h = 4/(n-p),lty=2,col='red')
-#influencePlot(model_2)
-#outlierTest(model_2)
+
 bodyfat[86,]
 ## delete number 86 and fit the model again
 model_4=lm(BODYFAT~ ., data=bodyfat[-c(39,86,182,216 ),c(-1,-3)])
@@ -171,8 +162,7 @@ layout(matrix(1:1, ncol=1))
 plot(model_4,which = 4)
 n=n-1#delete 42
 abline(h = 4/(n-p),lty=2,col='red')
-influencePlot(model_4)
-outlierTest(model_4)
+
 
 # after cleaning the data the new dataset
 bodyfat_new=bodyfat[-c(39,86,182,216),c(-1)]
