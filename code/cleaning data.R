@@ -2,11 +2,17 @@ rm(list=ls())
 setwd('/Users/apple/Documents/Wisc/study/2019Fall/STAT 628/Module2')
 bodyfat=read.csv('BodyFat.csv')
 head(bodyfat)
-
+head(as.matrix(bodyfat))
 summary(bodyfat)
-which.min(bodyfat$DENSITY)
 
-bodyfat[216,]#this guy has a density<1 
+##########################################
+#######dataset display####################
+##########################################
+
+###vitualizing data 
+boxplot(bodyfat,cex.axis=0.5,main="Bodyfat",xlab="Varialbes",ylab="")
+which.min(bodyfat$DENSITY)
+bodyfat[c(182,216),]#this guy has a density<1 
 bodyfat[182,]#this has bodyfat=0
 #these two guy we need to check
 
@@ -23,6 +29,9 @@ plot(bodyfat$BODYFAT ~ reverse.density,main="Siri's equation",xlab="1/Density",y
 text(reverse.density[c(96, 182 ,48 ,76)],bodyfat$BODYFAT[c(96, 182 ,48 ,76)] ,c(96, 182 ,48 ,76),p=4) #96 182 48 76
 #From the plot above ,there are some points need to check
 bodyfat[c(48 ,76,96, 182 ),]
+cal_bodyfat=495/bodyfat$DENSITY-450
+cbind(bodyfat$IDNO[c(48 ,76,96, 182 )],bodyfat$BODYFAT[c(48 ,76,96, 182 )],cal_bodyfat[c(48 ,76,96, 182 )])
+
 
 #1)
 #for the 48 its bodyfat is 6.4 which shows something wrong
@@ -44,7 +53,7 @@ bodyfat[c(182,183,184),]#the bodyfat is 0 so we should use density to compute
 #hence we should delect 182,neither the bodyfat nor density  are correct.
 #4)
 #for the 76
-bodyfat[c(72,76),]
+bodyfat[c(75,76),]
 #compare these two ,we can see that the bodyfat has a large diff
 #however the bmi not shows much diff and the other variables shows the 76 should not be fat
 #hence the bodyfat of 76 might be wrong 
@@ -52,27 +61,32 @@ fat=495/bodyfat$DENSITY[76]- 450
 bodyfat$BODYFAT[76]=fat
 #check again
 reverse.density=1/bodyfat$DENSITY
-plot(bodyfat$BODYFAT[-182] ~ reverse.density[-182],main="Siri's equation",xlab="1/Density",ylab="Body fat",pch=19,col="red")
+plot(bodyfat$BODYFAT[-c(182)] ~ reverse.density[-c(182)],main="Siri's equation",xlab="1/Density",ylab="Body fat",pch=19,col="red",xlim=c(0.9,1.05),ylim=c(0,50))
+text(reverse.density[216],bodyfat$BODYFAT[216] ,c(216),p=2)
+plot(bodyfat$BODYFAT[-c(182,216)] ~ reverse.density[-c(182,216)],main="Siri's equation",xlab="1/Density",ylab="Body fat",pch=19,col="red",xlim=c(0.9,1.05),ylim=c(0,50))
 
-#from above,we know that 182 is the one we need to delet 
+
+#from above,we know that 182 is the one we need to delete 
 #and for 216,it's 1/density and bodyfat is on the line,
 #hence the density is wrong and the bodyfat is computed by siri's equation
-#thus the 216 should also delet.
+#thus the 216 should also delete.
 
 #2. use BMI to find outliers bmi=weight/(height)^2
 bmi=bodyfat$WEIGHT/(bodyfat$HEIGHT)^2
 plot(bodyfat$ADIPOSITY[c(-182,-216)] ~ bmi[c(-182,-216)],main="BMI equation",xlab=expression(WEIGHT/(HEIGHT)^2),ylab="ADIPOSITY",pch=19,col="red")
 text(bmi[c(42,163)],bodyfat$ADIPOSITY[c(42,163)]  ,c(42,163),p=3) #42,163,221
 text(bmi[c(221)],bodyfat$ADIPOSITY[c(221)]  ,c(221),p=1) #42,163,221
+bodyfat[c(42,163,221),]
+
+#construct a model so that we can use bmi to compute ADIPOSITY
+model.bmi=lm(bodyfat$ADIPOSITY[-c(42,163,221)]~bmi[-c(42,163,221)])
+summary(model.bmi)
+#then ADIPOSITY=0.07035+702.07386*bmi
 
 #1)check what's wrong with 42
 bodyfat[c(41,42,43),]#the heigth of the 42 is only 29.5 which might be mistake
 sqrt(bodyfat$WEIGHT[42]/bodyfat$ADIPOSITY[42])
-#construct a model so that we can use bmi to compute ADIPOSITY
-model.bmi=lm(bodyfat$ADIPOSITY[-42]~bmi[-42])
-summary(model.bmi)
-#then ADIPOSITY=0.1942+698.6151*bmi
-bmi.42=(bodyfat$ADIPOSITY[42]-0.1942)/698.6151
+bmi.42=(bodyfat$ADIPOSITY[42]-0.07035)/702.07386
 height=sqrt(bodyfat$WEIGHT[42]/bmi.42)
 #hence the height of the 42 guy is 69.4345 much reliable
 bodyfat$HEIGHT[42]=height
@@ -85,7 +99,7 @@ bodyfat[c(116,123,218,221),]
 #there is one mistake among these three,we can compare the rest variables 221's are larger than 218's
 #but the weight is smaller,and then compare 211 with 116,123...
 #hence the weight of 221 might be wrong
-bmi.221=(bodyfat$ADIPOSITY[221]-0.1942)/698.6151
+bmi.221=(bodyfat$ADIPOSITY[221]-0.07035)/702.07386
 weight=bmi.221*(bodyfat$HEIGHT[221])^2
 bodyfat$WEIGHT[221]=weight
 #3)check 163
@@ -105,7 +119,7 @@ plot(bodyfat$ADIPOSITY ~ bmi,main="BMI equation",xlab=expression(WEIGHT/(HEIGHT)
 text(bmi[c(42,163,221)],bodyfat$ADIPOSITY[c(42,163,221)]  ,c(42,163,221),p=2) #96 182 48 76
 #it seems good
 
-#using these two euqations we only delet 182,216 and change some values 
+#using these two euqations we only delete 182,216 and change some values 
 
 
 # 3. use the Cook's distance to detect outliers
@@ -116,8 +130,8 @@ text(bmi[c(42,163,221)],bodyfat$ADIPOSITY[c(42,163,221)]  ,c(42,163,221),p=2) #9
 #Rule of thumb: classify as leverages anything above 4/(n-p).
 model=lm(BODYFAT~ ., data=bodyfat[-c(182,216 ),c(-1,-3)])
 plot(model,which = 4)
-n=nrow(bodyfat[-c(182 ),c(-1,-3)])
-p=ncol(bodyfat[-c(182 ),c(-1,-3)])
+n=nrow(bodyfat[-c(182,216 ),c(-1,-3)])
+p=ncol(bodyfat[-c(182,216 ),c(-1,-3)])
 abline(h = 4/(n-p),lty=2,col='red')
 #library(car)
 #influencePlot(model)#
@@ -130,38 +144,36 @@ abline(h = 4/(n-p),lty=2,col='red')
 #and linear mixed models.
 
 #we can see the 39 is a influntial point
-outlier=bodyfat[39,]#only  29.5 height outlier
+outlier=bodyfat[39,]
 bodyfat[39,]#weight  363.15 pounds
 #since we'd like to find a way to predict the bodyfat for most people
 #39 as a very influntial point may affect our result and the it's not common
 #hence we decide to delect 39
 
 ## delect number 39 and fit the model again
-model_1=lm(BODYFAT~ ., data=bodyfat[-c(39,182,216 ),c(-1,-3)])
-summary(model_1)
-layout(matrix(1:4, ncol=2))
-plot(model_1)
-layout(matrix(1:1, ncol=1))
-plot(model_1,which = 4)
-n=n-1
-abline(h = 4/(n-p),lty=2,col='red')
-influencePlot(model_1)
-outlierTest(model_1)
-bodyfat[86,]
-## delect number 86 and fit the model again
-model_2=lm(BODYFAT~ ., data=bodyfat[-c(39,86,182,216 ),c(-1,-3)])
+model_2=lm(BODYFAT~ ., data=bodyfat[-c(39,182,216 ),c(-1,-3)])
 summary(model_2)
 layout(matrix(1:4, ncol=2))
 plot(model_2)
 layout(matrix(1:1, ncol=1))
 plot(model_2,which = 4)
-n=n-1
+n=n-1#delete 39
 abline(h = 4/(n-p),lty=2,col='red')
-influencePlot(model_2)
-outlierTest(model_2)
+#influencePlot(model_2)
+#outlierTest(model_2)
+bodyfat[86,]
+## delete number 86 and fit the model again
+model_4=lm(BODYFAT~ ., data=bodyfat[-c(39,86,182,216 ),c(-1,-3)])
+summary(model_4)
+layout(matrix(1:4, ncol=2))
+plot(model_4)
+layout(matrix(1:1, ncol=1))
+plot(model_4,which = 4)
+n=n-1#delete 42
+abline(h = 4/(n-p),lty=2,col='red')
+influencePlot(model_4)
+outlierTest(model_4)
 
 # after cleaning the data the new dataset
 bodyfat_new=bodyfat[-c(39,86,182,216),c(-1)]
 write.csv(bodyfat_new,"clean dataset.csv")
-
-
