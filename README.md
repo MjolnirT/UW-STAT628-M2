@@ -1,6 +1,8 @@
 # Bodyfat Analysis
 
-This a file that briefly summarizes the contents of the repository. 
+Nowadays,health becomes a prevalent topic around world. People pay more attention on their bodyfat percentage which is a measurement to evaluate their healthy condition. However,it is inconvenient to get an accurate bodyfat percentage in the daily life. Hence our group would like to find a simple,robust and aslo accurate way to estimate the bodyfat.Our analysis based on a real data set contains 252 males and their common body measurements.
+
+
 ## Data
 This folder contains two csv files.One is the raw dataset called Bodyfat and the other is the cleaned dataset.
 
