@@ -1,4 +1,5 @@
 #mallow's cp
+setwd(dir = "Desktop/UW-Madion 学习/628/Module2/")
 cleanbodyfat=read.csv("clean dataset.csv")
 library(leaps)
 library(faraway)
@@ -41,10 +42,11 @@ print(colnames(cleanbodyfat)[as.numeric(which(g1$which[1,]==TRUE)) + 3])
 model_cp7 = BODYFAT  ~ ABDOMEN 
 cp7_cv = CVMSE(cleanbodyfat, model_cp7, 5,100)   # number of variables is 1
 cp_cv=c(cp0_cv,cp1_cv,cp2_cv,cp3_cv,cp4_cv,cp5_cv,cp6_cv,cp7_cv)
-plot(x=8:1,cp_cv,xlab = "number of variavbles",ylab="Mean square error",type = "b")
-plot(x=1:8,y=g1$Cp[1:8],xlab = "number of variavbles",ylab="Mallow's cp",type = "b")
+par(mfrow=c(1,2))
+plot(x=8:1,cp_cv,xlab = "number of variavbles",ylab="Mean square error",type = "b",main = "MSE vs # of variables")
+plot(x=1:8,y=g1$Cp[1:8],xlab = "number of variavbles",ylab="Mallow's cp",type = "b",main = "Cp vs # of variables")
 
 #After plotting the mean square errors after cross validation and Mallow's cp whose number of variables vary from 1 to 8, we think 3 is the relatively good number of variables to estimate bodyfat. 
 #The model after the criterion of mallow's cp is BODYFAT  ~  WEIGHT + ABDOMEN + WRIST.
 lm(BODYFAT  ~  WEIGHT + ABDOMEN + WRIST,data = cleanbodyfat)
-#BODYFAT  =  -0.08617*WEIGHT + 0.87932*ABDOMEN -1.28342 -23.58136
+#BODYFAT  =  -0.08617*WEIGHT + 0.87932*ABDOMEN -1.28342*WRIST -23.58136
