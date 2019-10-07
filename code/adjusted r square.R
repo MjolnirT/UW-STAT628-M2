@@ -43,9 +43,11 @@ print(colnames(cleanbodyfat)[as.numeric(which(g2$which[1,]==TRUE)) + 3])
 model_adjr28 = BODYFAT ~ ABDOMEN 
 adjr28_cv = CVMSE(cleanbodyfat, model_adjr28, 5,100)   # number of variables is 1
 adjr2_cv=c(adjr20_cv,adjr21_cv,adjr22_cv,adjr23_cv,adjr24_cv,adjr25_cv,adjr26_cv,adjr27_cv,adjr28_cv)
-plot(x=9:1,adjr2_cv,xlab = "number of variavbles",ylab="Mean square error",type = "b")
-plot(x=1:9,g2$adjr2[1:9],xlab = "number of variavbles",ylab="Adjusted R Square",type = "b")
+par(mfrow=c(1,2))
+plot(x=9:1,adjr2_cv,xlab = "number of variavbles",ylab="Mean square error",type = "b",main = "MSE vs # of variables")
+plot(x=1:9,g2$adjr2[1:9],xlab = "number of variavbles",ylab="Adjusted R Square",type = "b",main = "Adjusted R Square vs # of variables")
 #After plotting the mean square errors after cross validation and the adjusted r square whose number of variables vary from 1 to 9, we think 2 has met the requirement of enough accuracy of the model.
 #The model after the criterion of Adjusted R Square is BODYFAT  ~  WEIGHT + ABDOMEN.
 lm(BODYFAT  ~  WEIGHT + ABDOMEN,data = cleanbodyfat)
 #BODYFAT  =  -0.1230*WEIGHT + 0.8956*ABDOMEN -41.9007
+
