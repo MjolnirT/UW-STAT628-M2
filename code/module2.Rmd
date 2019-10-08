@@ -1,0 +1,351 @@
+---
+title: "module2"
+author: "Hao Qin  "
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE,warning = FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1.Cleaning data
+```{r,echo = FALSE, warning = FALSE, message=FALSE}
+rm(list=ls())
+library(car)
+library(knitr)
+library(carData)
+library(plyr)
+library(stringr)
+#setwd(paste0(strsplit(getwd(),split = "/code"), "/dataset"))
+bodyfat=read.csv('BodyFat.csv')
+#boxplot(bodyfat)
+```
+
+## 2.Detection of the outliers and their treatment 
+
+We use three different types of method to detect not only the outliers, but also the influence points in the original dataset, 
+which is Siri's equation, BMI formula and cook's distance. Those points will deviate from the line or the region on which most points are, 
+thus, it is easy for us to detect them through graphics.
+```{r, echo = FALSE, warning = FALSE,fig.height = 2}
+table <- data.frame(Outliers = c(39,42,48,76,86,96,163,182,216,221), 
+                    Detection_method = c('Cook\'s distance','BMI formula','Siri\'s equation','Siri\'s equation','influence test',
+                                         'Siri\'s equation','BMI formula','Siri\'s equation','Siri\'s equation','BMI formula'),
+                    Abnormal_Component = c('large Cook\'s distance','too short in height','abnormal body fat','abnormal body fat','deviating from the majority',
+                                           'abnormal body fat','abnormal BMI index','zero body fat','density below than 1','lighter than normal'),
+                    Treatment = c('deleting','imputation','imputation','imputation','deleting','imputation','imputation','deleting','deleting','imputation'))
+#print(table)
+kable(table)
+
+layout(matrix(1:4,ncol= 4))
+#siri's theatre
+reverse.density=1/bodyfat$DENSITY
+plot(bodyfat$BODYFAT ~ reverse.density,main="Siri's equation",xlab="1/Density",ylab="Body fat",pch=19,col="red")
+text(reverse.density[c(96, 182 ,48 ,76)],bodyfat$BODYFAT[c(96, 182 ,48 ,76)] ,c(96, 182 ,48 ,76),p=4) 
+text(reverse.density[216],bodyfat$BODYFAT[216],c(216),p = 2)#96 182 48 76 216
+#48th entry
+bodyfat$BODYFAT[48]=495/bodyfat$DENSITY[48]- 450
+#96th entry
+bodyfat$DENSITY[96]=495/(bodyfat$BODYFAT[96]+450)
+#deleting 182th entry
+#76th entry
+bodyfat$BODYFAT[76]=495/bodyfat$DENSITY[76]- 450
+#deleting 216th entry
+
+
+#BMI's theatre
+bmi=bodyfat$WEIGHT/(bodyfat$HEIGHT)^2
+plot(bodyfat$ADIPOSITY[c(-182,-216)] ~ bmi[c(-182,-216)],main="BMI equation",xlab=expression(WEIGHT/(HEIGHT)^2),ylab="ADIPOSITY",pch=19,col="red")
+text(bmi[c(42,163)],bodyfat$ADIPOSITY[c(42,163)]  ,c(42,163),p=3) #42,163,221
+text(bmi[c(221)],bodyfat$ADIPOSITY[c(221)]  ,c(221),p=1) #42,163,221
+#42th entry
+bmi.42=(bodyfat$ADIPOSITY[42]-0.07035)/702.07386
+height<-sqrt(bodyfat$WEIGHT[42]/bmi.42)
+bodyfat$HEIGHT[42]=height
+#211the entry
+bmi.221=(bodyfat$ADIPOSITY[221]-0.07035)/702.07386
+weight=bmi.221*(bodyfat$HEIGHT[221])^2
+bodyfat$WEIGHT[221]<-weight
+#163th entry
+bmi.163=bodyfat$WEIGHT[163]/(bodyfat$HEIGHT[163])^2
+adi=0.1942+698.6151*bmi.163
+bodyfat$ADIPOSITY[163]<-adi
+
+#39th entry
+model=lm(BODYFAT~ ., data=bodyfat[-c(182,216 ),c(-1,-3)])
+plot(model,which = 4)
+n=nrow(bodyfat[-c(182,216 ),c(-1,-3)])
+p=ncol(bodyfat[-c(182,216 ),c(-1,-3)])
+abline(h = 4/(n-p),lty=2,col='red')
+#86th entry
+model_2=lm(BODYFAT~ ., data=bodyfat[-c(39,182,216 ),c(-1,-3)])
+plot(model_2,which = 4)
+n=n-1#delete 39
+abline(h = 4/(n-p),lty=2,col='red')
+```
+```{r,echo = FALSE, warning = FALSE, message=FALSE, fig.height = 2}
+# rechecking from the plots
+layout(matrix(1:3,ncol= 3))
+plot(bodyfat$BODYFAT[-c(182,216)] ~ reverse.density[-c(182,216)],
+     main="Siri's equation \n without the 216th entry",xlab="1/Density",ylab="Body fat",pch=19,col="red",xlim=c(0.9,1.05),ylim=c(0,50))
+
+bmi=bodyfat$WEIGHT/(bodyfat$HEIGHT)^2
+plot(bodyfat$ADIPOSITY ~ bmi,main="BMI equation",xlab=expression(WEIGHT/(HEIGHT)^2),ylab="ADIPOSITY",pch=19,col="red")
+text(bmi[c(42,163,221)],bodyfat$ADIPOSITY[c(42,163,221)]  ,c(42,163,221),p=2) #96 182 48 76
+
+model_4=lm(BODYFAT~ ., data=bodyfat[-c(39,86,182,216 ),c(-1,-3)])
+plot(model_4,which = 4)
+n=n-1#delete 42
+abline(h = 4/(n-p),lty=2,col='red')
+bodyfat_new=bodyfat[-c(39,86,182,216),c(-1)]
+```
+
+## 3.Selecting variables
+In this part, several methods have been applied, including stepwise aic and bic selection, lasso and group lasso, mallow’s cp and Bess, which is a new proposed way to selecting variables. After applying these methods, since the total sample size is not large, we can use cross validation to measure the performance of each method, to decide which component should be treated as the independent variable in the final model. To be specific, the final model should be as a rule of thumb, which requires that the quantity of the independent variables should not exceed four.
+```{r,echo = FALSE, warning = FALSE, message=FALSE}
+#aic and bic
+##From the BIC method
+CVgroup=function(k,Ndata){
+  cvlist=list()
+  allseq=rep(1:k,ceiling(Ndata/k))[1:Ndata]   
+  temp=sample(allseq,Ndata)   
+  x=1:k
+  dataseq=1:Ndata
+  cvlist=lapply(x,function(x) {dataseq[temp==x]})  
+  return(cvlist)
+}
+
+mygroup=CVgroup(5,nrow(bodyfat_new))
+
+
+#calculate the mean mse after cross validation
+DoCV=function(k,insertdata,model){
+  mygroup=CVgroup(k,nrow(insertdata))
+  datacol=ncol(insertdata)
+  MSEs=1:k
+  for(i in 1:5) {
+    Ntraining = setdiff(1:5, i)
+    trainingINDEX = numeric()
+    
+    for (t in Ntraining) {
+      trainingINDEX = c(trainingINDEX, unlist(mygroup[[t]]))
+    }
+    
+    testINDEX = mygroup[[i]]
+    
+    m = lm(model, data  = insertdata[trainingINDEX, ])
+    
+    test_X = insertdata[testINDEX, 2:datacol]
+    test_Y = insertdata[testINDEX, 1]
+    
+    predicted_Y = predict(m, test_X)
+    MSEs[i] = sum((test_Y - predicted_Y)^2) / length(test_Y)
+  }
+  return(mean(MSEs))
+}
+
+#calculate the mse after s times
+CVMSE=function(insertdata,model,k,s){
+  sumMES = 0
+  
+  for (i in 1:s) {
+    sumMES = sumMES + DoCV(k,insertdata, model)
+  }
+  
+  return(sumMES / s)
+}
+model.new <- lm(BODYFAT~ WEIGHT + ABDOMEN + WRIST,data=bodyfat_new) # the R^2 is 0.7251
+res.bic.4 <- model.new$residuals
+model.bic1=BODYFAT ~ WEIGHT + ABDOMEN + WRIST
+bic_cv1 = CVMSE(bodyfat_new, model.bic1, 5,100)
+#leaving wrist out
+model.new1<-lm(BODYFAT~ WEIGHT + ABDOMEN,data=bodyfat_new)
+model.bic2=BODYFAT ~ WEIGHT + ABDOMEN
+bic_cv2 = CVMSE(bodyfat_new, model.bic2, 5,100)
+#one variable, part one
+model.new2=lm(BODYFAT~ WEIGHT,data=bodyfat_new)
+model.bic3=BODYFAT ~ WEIGHT
+bic_cv3 = CVMSE(bodyfat_new, model.bic3, 5,100)
+#one variable,part two
+model.new3=lm(BODYFAT~  ABDOMEN ,data=bodyfat_new)
+model.bic3=BODYFAT ~ ABDOMEN 
+bic_cv4 = CVMSE(bodyfat_new, model.bic3, 5,100)
+```
+
+```{r,echo = FALSE, warning = FALSE, message=FALSE, fig.height = 2.5, fig.width = 7}
+# adjusted R^2 square
+library(leaps)
+library(faraway)
+layout(matrix(1:3,ncol= 3))
+cleanbodyfat = bodyfat_new
+n=ncol(cleanbodyfat)
+X = cleanbodyfat[, 3:n]
+Y = cleanbodyfat$BODYFAT
+a<-regsubsets(X,Y)
+plot(a,scale="adjr2")
+g2=leaps(X, Y, nbest = 1,method = "adjr2")
+#print(colnames(cleanbodyfat)[as.numeric(which(g2$which[9,]==TRUE)) + 3])
+model_adjr20 = BODYFAT ~ AGE + WEIGHT + NECK + ABDOMEN +  HIP + THIGH + BICEPS + FOREARM + WRIST
+adjr20_cv = CVMSE(cleanbodyfat, model_adjr20, 5,100)   # number of variables is 9
+#print(colnames(cleanbodyfat)[as.numeric(which(g2$which[8,]==TRUE)) + 3])
+model_adjr21 = BODYFAT ~ AGE + WEIGHT + NECK + ABDOMEN + THIGH + BICEPS + FOREARM + WRIST
+adjr21_cv = CVMSE(cleanbodyfat, model_adjr21, 5,100)   # number of variables is 8
+#print(colnames(cleanbodyfat)[as.numeric(which(g2$which[7,]==TRUE)) + 3])
+model_adjr22 = BODYFAT ~ AGE + WEIGHT + NECK + ABDOMEN + THIGH  + FOREARM + WRIST
+adjr22_cv = CVMSE(cleanbodyfat, model_adjr22, 5,100)   # number of variables is 7
+#print(colnames(cleanbodyfat)[as.numeric(which(g2$which[6,]==TRUE)) + 3])
+model_adjr23 = BODYFAT ~ AGE + WEIGHT + ABDOMEN + THIGH  + FOREARM + WRIST
+adjr23_cv = CVMSE(cleanbodyfat, model_adjr23, 5,100)   # number of variables is 6
+#print(colnames(cleanbodyfat)[as.numeric(which(g2$which[5,]==TRUE)) + 3])
+model_adjr24 = BODYFAT ~ AGE + WEIGHT + ABDOMEN + THIGH + WRIST
+adjr24_cv = CVMSE(cleanbodyfat, model_adjr24, 5,100)   # number of variables is 5
+#print(colnames(cleanbodyfat)[as.numeric(which(g2$which[4,]==TRUE)) + 3])
+model_adjr25 = BODYFAT ~ WEIGHT + ABDOMEN + BICEPS + WRIST
+adjr25_cv = CVMSE(cleanbodyfat, model_adjr25, 5,100)   # number of variables is 4
+#print(colnames(cleanbodyfat)[as.numeric(which(g2$which[3,]==TRUE)) + 3])
+model_adjr26 = BODYFAT ~ WEIGHT + ABDOMEN +  WRIST
+adjr26_cv = CVMSE(cleanbodyfat, model_adjr26, 5,100)   # number of variables is 3
+#print(colnames(cleanbodyfat)[as.numeric(which(g2$which[2,]==TRUE)) + 3])
+model_adjr27 = BODYFAT ~ WEIGHT + ABDOMEN
+adjr27_cv = CVMSE(cleanbodyfat, model_adjr27, 5,100)   # number of variables is 2
+#print(colnames(cleanbodyfat)[as.numeric(which(g2$which[1,]==TRUE)) + 3])
+model_adjr28 = BODYFAT ~ ABDOMEN 
+adjr28_cv = CVMSE(cleanbodyfat, model_adjr28, 5,100)   # number of variables is 1
+adjr2_cv=c(adjr20_cv,adjr21_cv,adjr22_cv,adjr23_cv,adjr24_cv,adjr25_cv,adjr26_cv,adjr27_cv,adjr28_cv)
+plot(x=9:1,adjr2_cv,xlab = "number of variavbles",ylab="Mean square error",type = "b",main = "MSE vs # of variables")
+plot(x=1:9,g2$adjr2[1:9],xlab = "number of variavbles",ylab="Adjusted R Square",type = "b",main = "Adjusted R Square vs # of variables")
+```
+
+
+
+```{r,echo = FALSE, warning = FALSE, message=FALSE, fig.height = 2.5, fig.width = 7}
+#mallow's cp
+layout(matrix(1:3,ncol= 3))
+cleanbodyfat = bodyfat_new
+n=ncol(cleanbodyfat)
+X = cleanbodyfat[, 3:n]
+Y = cleanbodyfat$BODYFAT
+a=regsubsets(X,Y)
+plot(a,scale="Cp")
+g1=leaps(X, Y, nbest = 1,method = "Cp")
+#Cpplot(g1)
+#order(g1$Cp)[1] #7
+model_cp0 = BODYFAT ~ AGE + WEIGHT + NECK + ABDOMEN  + THIGH + BICEPS + FOREARM + WRIST
+cp0_cv = CVMSE(cleanbodyfat, model_cp0, 5,100)   # number of variables is 8
+#print(colnames(cleanbodyfat)[as.numeric(which(g1$which[7,]==TRUE)) + 3])
+model_cp1 = BODYFAT  ~ AGE + WEIGHT + NECK + ABDOMEN  + THIGH + FOREARM + WRIST
+cp1_cv = CVMSE(cleanbodyfat, model_cp1, 5,100)   # number of variables is 7
+#print(colnames(cleanbodyfat)[as.numeric(which(g1$which[6,]==TRUE)) + 3])  
+model_cp2 = BODYFAT  ~ AGE + WEIGHT + ABDOMEN + THIGH + FOREARM + WRIST
+cp2_cv = CVMSE(cleanbodyfat, model_cp2, 5,100)   # number of variables is 6
+#print(colnames(cleanbodyfat)[as.numeric(which(g1$which[5,]==TRUE)) + 3])  
+model_cp3 = BODYFAT  ~  WEIGHT + NECK + ABDOMEN + THIGH + WRIST
+cp3_cv = CVMSE(cleanbodyfat, model_cp3, 5,100)   # number of variables is 5
+#print(colnames(cleanbodyfat)[as.numeric(which(g1$which[4,]==TRUE)) + 3])  
+model_cp4 = BODYFAT  ~  WEIGHT + ABDOMEN + BICEPS + WRIST
+cp4_cv = CVMSE(cleanbodyfat, model_cp4, 5,100)   # number of variables is 4
+#print(colnames(cleanbodyfat)[as.numeric(which(g1$which[3,]==TRUE)) + 3])  
+model_cp5 = BODYFAT  ~  WEIGHT + ABDOMEN + WRIST
+cp5_cv = CVMSE(cleanbodyfat, model_cp5, 5,100)   # number of variables is 3
+#print(colnames(cleanbodyfat)[as.numeric(which(g1$which[2,]==TRUE)) + 3])  
+model_cp6 = BODYFAT  ~  WEIGHT + ABDOMEN 
+cp6_cv = CVMSE(cleanbodyfat, model_cp6, 5,100)   # number of variables is 2
+#print(colnames(cleanbodyfat)[as.numeric(which(g1$which[1,]==TRUE)) + 3])  
+model_cp7 = BODYFAT  ~ ABDOMEN 
+cp7_cv = CVMSE(cleanbodyfat, model_cp7, 5,100)   # number of variables is 1
+cp_cv=c(cp0_cv,cp1_cv,cp2_cv,cp3_cv,cp4_cv,cp5_cv,cp6_cv,cp7_cv)
+#par(mfrow=c(1,2))
+plot(x=8:1,cp_cv,xlab = "number of variavbles",ylab="Mean square error",type = "b",main = "MSE vs # of variables")
+plot(x=1:8,y=g1$Cp[1:8],xlab = "number of variavbles",ylab="Mallow's cp",type = "b",main = "Cp vs # of variables")
+```
+
+```{r}
+#lasso and group lasso
+```
+
+```{r,echo = FALSE, warning = FALSE, message=FALSE, fig.height = 2, fig.width = 7}
+library("BeSS")
+total=bodyfat_new
+total = total[,-2]
+aic_bess = c()
+bic_bess = c()
+gic_bess = c()
+mse_bess = c()
+aic_bess[1] = Inf
+bic_bess[1] = Inf
+gic_bess[1] = Inf
+mse_bess[1] = Inf
+for ( i in 2:(length(total[1,])-1)){
+  model_bic <- bess.one(x = total[,-1],y = total[,1],s = i)
+  mse_bess[i] = model_bic$mse
+  aic_bess[i] = model_bic$AIC
+  bic_bess[i] = model_bic$BIC
+  gic_bess[i] = model_bic$GIC
+}
+#c(which(mse_bess[] == min(mse_bess)), which(aic_bess[] == min(aic_bess)),which(bic_bess[] == min(bic_bess)),which(gic_bess[] == min(gic_bess)))
+layout(matrix(1:4,ncol = 4))
+plot(x = 2:length(total[1,])-1, y = mse_bess,xlab = "number of variables",ylab = "mse")
+plot(x = 2:length(total[1,])-1, y =aic_bess,xlab = "number of variables",ylab = "AIC")
+plot(x = 2:length(total[1,])-1, y =bic_bess,xlab = "number of variables",ylab = "BIC")
+plot(x = 2:length(total[1,])-1, y =gic_bess,xlab = "number of variables",ylab = "GIC")
+model_bess_5 <- bess.one(y = total[,1], x = total[,-1],s = 5)
+model_bess_4 <- bess.one(y = total[,1], x = total[,-1],s = 4)
+model_bess_3 <- bess.one(y = total[,1], x = total[,-1],s = 3)
+#CV
+times = 1000
+mse_bess_5 <- rep(0,times)
+mse_bess_4 <- rep(0,times)
+mse_bess_3 <- rep(0,times)
+total_bess_5 <- rep(0,times)
+total_bess_4 <- rep(0,times)
+total_bess_3 <- rep(0,times)
+for (g in 1:times){
+  choices = sample(1: length(total[,1]),82*2)
+  test <- total[as.vector(choices),]
+  val <- total[-as.vector(choices),]
+  
+  model_bess_3 <- bess.one(y = test[,1], x = test[,c(4,7,8)],s = 3)
+  pre_bess_3 <-predict(model_bess_3,val,type = "BIC")
+  
+  model_bess_5 <- bess.one(y = test[,1], x = test[,c(3,5,7,8,15)],s = 5)
+  pre_bess_5 <-predict(model_bess_5,val,type = "BIC")
+  
+  model_bess_4 <- bess.one(y = test[,1], x = test[,c(3,5,7,8)],s = 4)
+  pre_bess_4 <-predict(model_bess_4,val,type = "BIC")
+    
+  ave <- ave(val[,1])
+  for( i in 1:length(val[,1])){
+    mse_bess_5[g] = as.numeric((pre_bess_5[i] - val[i,1])^2) + mse_bess_5[g]
+    mse_bess_4[g] = as.numeric((pre_bess_4[i] - val[i,1])^2) + mse_bess_4[g]
+    mse_bess_3[g] = as.numeric((pre_bess_3[i] - val[i,1])^2) + mse_bess_3[g]
+    total_bess_5[g] = as.numeric((val[i,1] - ave[i])^2) + total_bess_5[g]
+    total_bess_4[g] = as.numeric((val[i,1] - ave[i])^2) + total_bess_4[g]
+    total_bess_3[g] = as.numeric((val[i,1] - ave[i])^2) + total_bess_3[g]
+  }
+}
+R2_5 = mean(1 - mse_bess_5/total_bess_5)
+R2_4 = mean(1 - mse_bess_4/total_bess_4)
+R2_3 = mean(1 - mse_bess_3/total_bess_3)
+mse_bess_5_cv = mean(mse_bess_5/(length(total[,1])-82*2))
+mse_bess_4_cv = mean(mse_bess_4/(length(total[,1])-82*2))
+mse_bess_3_cv = mean(mse_bess_3/(length(total[,1])-82*2))
+```
+
+
+```{r,echo = FALSE, warning = FALSE, message=FALSE}
+table2 <- data.frame(model = c(rep('BIC', 4), rep('Mallow\'s Cp', 4), rep('Adjusted R square', 4), rep('BeSS', 3)),
+                     Mean_Sq = c(bic_cv1, bic_cv2, bic_cv3, bic_cv4, 
+                                 cp7_cv, cp6_cv, cp5_cv, cp4_cv, 
+                                 adjr28_cv, adjr27_cv, adjr26_cv, adjr25_cv,
+                                 mse_bess_3_cv, mse_bess_4_cv, mse_bess_5_cv),
+                     variables = c('WEIGHT + ABDOMEN + WRIST', 'WEIGHT + ABDOMEN', 'WEIGHT', 'ABDOMEN', 
+                                   'ABDOMEN', 'WEIGHT + ABDOMEN', 'WEIGHT + ABDOMEN + WRIST', 'WEIGHT + ABDOMEN + BICEPS + WRIST', 
+                                   'ABDOMEN', 'WEIGHT + ABDOMEN', 'WEIGHT + ABDOMEN +  WRIST', 'WEIGHT + ABDOMEN + BICEPS + WRIST',
+                                   'HEIGHT + CHEST + ABDOMEN', 'ADIPOSITY + CHEST + ABDOMEN + HIP ', 'WEIGHT + ADIPOSITY + CHEST + ABDOMEN + WRIST'
+                                   ))
+table2  = table2[order(table2$Mean_Sq),]
+kable(table2)
+```
+
+## Model building
