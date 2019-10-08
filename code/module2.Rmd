@@ -2,8 +2,8 @@
 title: "module2"
 author: "Hao Qin  "
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE,warning = FALSE, message=FALSE}
@@ -36,7 +36,7 @@ table <- data.frame(Outliers = c(39,42,48,76,86,96,163,182,216,221),
                                            'abnormal body fat','abnormal BMI index','zero body fat','density below than 1','lighter than normal'),
                     Treatment = c('deleting','imputation','imputation','imputation','deleting','imputation','imputation','deleting','deleting','imputation'))
 #print(table)
-kable(table)
+kable(table, caption = "Outliers and treatments")
 
 layout(matrix(1:4,ncol= 4))
 #siri's theatre
@@ -345,7 +345,8 @@ table2 <- data.frame(model = c(rep('BIC', 4), rep('Mallow\'s Cp', 4), rep('Adjus
                                    'HEIGHT + CHEST + ABDOMEN', 'ADIPOSITY + CHEST + ABDOMEN + HIP ', 'WEIGHT + ADIPOSITY + CHEST + ABDOMEN + WRIST'
                                    ))
 table2  = table2[order(table2$Mean_Sq),]
-kable(table2)
+kable(table2, caption = "Different methods with multiple choices of variables")
 ```
 
-## Model building
+## 4.Model building
+From Table 2, there is no significant difference in Mean squared error among those different methods except the situation of one variable. Considering the rule of thumb, we decide to choose a model within two variables, which is also a not heavy sacrifice in accuracy. The variables we select is weight and abdomen, applied in the linear model.
