@@ -2,7 +2,7 @@
 <html>
 <head><meta charset="utf-8" />
 
-<title>Summary</title>
+<title>PDF_summary</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
@@ -13077,12 +13077,13 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><h1 style="text-align:center">A easy way to get Bodyfat </h1></p>
+<p><h1 style="text-align:center">Bodyfat Analysis </h1></p>
 <h4 style="text-align:right">Hao Qin, Jiacheng Mao, Qiaoyu Wang, Yuhan Meng </h4><h1 id="1.Introduction">1.Introduction<a class="anchor-link" href="#1.Introduction">&#182;</a></h1><p>Nowadays, the  physical health has become a serious concern in the modern society since excess storage of fat will lead to a variety range of disease and highly leave up the risk of coronary heart disease. To measure the fat of person, we also have developed several methods, including BMI index, which is the quotient of weight divided by height squared. 
 In this article, we develop a sample method to measure the bodyfat percentage of one person, which only requires few easily accessible variables.</p>
-<h2 id="1.1-Outliers-Detection">1.1 Outliers Detection<a class="anchor-link" href="#1.1-Outliers-Detection">&#182;</a></h2><p>The data we have is BodyFat.csv file which includes <strong>253</strong> persons physical data in total <strong>17</strong> variables. In order to use these data to build the model, we use three different types of methods to detect not only the outliers, but also the influence points in the original dataset, 
+<h2 id="1.1-Outliers-Detection">1.1 Outliers Detection<a class="anchor-link" href="#1.1-Outliers-Detection">&#182;</a></h2><p>The data we have is BodyFat.csv file which includes <strong>252</strong> persons physical data in total <strong>17</strong> variables. In order to use these data to build the model, we use three different types of methods to detect not only the outliers, but also the influence points in the original dataset, 
 which is Siri's equation, BMI formula and cook's distance. Those points will deviate from the line or the region on which most points are, 
-thus, it is easy for us to detect them through graphics.</p>
+thus, it is easy for us to detect them through graphics.
+<img src="images\head_bodyfat.png" width=720, height = 200></p>
 <h3 id="Siri's-equation">Siri's equation<a class="anchor-link" href="#Siri's-equation">&#182;</a></h3>$$ \text{Percentage of Body Fat} = \dfrac{495}{\text{Body Density(gm/cm^3)}} - 450$$<h3 id="BMI-equation">BMI equation<a class="anchor-link" href="#BMI-equation">&#182;</a></h3>$$ \text{BMI} = \dfrac{\text{weight}}{\text{hight}^2} $$<h3 id="Data-Diagnosis">Data Diagnosis<a class="anchor-link" href="#Data-Diagnosis">&#182;</a></h3>
 </div>
 </div>
@@ -13098,8 +13099,7 @@ thus, it is easy for us to detect them through graphics.</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>The criteria we follow in the treatment are three clauses:
-<strong>Retain</strong>, <strong>Impute</strong> or <strong>Exclude</strong>. If the data have no abnormal variables comparing to the majority points, we keep it into the final model fitting process. On the contrary, if the data has been detected from one of above three methods, we assume that some components are gathering incorrectly and need to impute the wrong component to retain the imputation. However, the if the imputed data does not reasonable neither, we have to delete it from the dataset. For the high influence point, we prefer to delete those points.</p>
+<h3 id="The-criteria-we-follow-in-the-treatment-are-three-clauses:">The criteria we follow in the treatment are three clauses:<a class="anchor-link" href="#The-criteria-we-follow-in-the-treatment-are-three-clauses:">&#182;</a></h3><p><strong>Retain</strong>, <strong>Impute</strong> or <strong>Exclude</strong>. If the data have no abnormal variables comparing to the majority points, we keep it into the final model fitting process. On the contrary, if the data has been detected from one of above three methods, we assume that some components are gathering incorrectly and need to impute the wrong component to retain the imputation. However, if the imputed data does not reasonable neither, we have to delete it from the dataset. For the high influence points, we prefer to delete those points.</p>
 
 </div>
 </div>
@@ -13123,14 +13123,30 @@ thus, it is easy for us to detect them through graphics.</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="1.2-Final-Checking">1.2 Final Checking<a class="anchor-link" href="#1.2-Final-Checking">&#182;</a></h2>
+<h2 id="2.2-Influence-Points-Checking">2.2 Influence Points Checking<a class="anchor-link" href="#2.2-Influence-Points-Checking">&#182;</a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Variable-Selection-and-Model-Fitting">Variable Selection and Model Fitting<a class="anchor-link" href="#Variable-Selection-and-Model-Fitting">&#182;</a></h1><p>In this part, several methods have been applied, including stepwise aic and bic selection, lasso, mallow’s cp and Bess, which is a new proposed way to selecting variables. After applying these methods, since the total sample size is not large, we can use cross validation to measure the performance of each method, to decide which component should be treated as the independent variable in the final model. To be specific, the final model should be as a rule of thumb, which requires that the quantity of the independent variables should not exceed four.</p>
+<p>In this part, we use Cook's distance to measure the influence of each point and eliminate those effects from a few points. Thus, we have detected the <strong>39th</strong>  and <strong>86th</strong> entries have large effect on the coefficients. After deleting those points, the Cook’s distance diagnostic is quite good so we stop at this time.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="images\cook_distance_compare.png" width=440, height = 250></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="2-Variable-Selection-and-Model-Fitting">2 Variable Selection and Model Fitting<a class="anchor-link" href="#2-Variable-Selection-and-Model-Fitting">&#182;</a></h1><p>In this part, several methods have been applied, including stepwise aic and bic selection, lasso, mallow’s cp and Bess, which is a new proposed way to selecting variables. After applying these methods, since the total sample size is not large, we can use cross validation to measure the performance of each method, to decide which component should be treated as the independent variable in the final model. To be specific, the final model should be as a rule of thumb, which requires that the quantity of the independent variables should not exceed four.</p>
 
 </div>
 </div>
@@ -13140,7 +13156,7 @@ thus, it is easy for us to detect them through graphics.</p>
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><img src="images\comparison_between_models.png" width=650, height = 230>
 To be specific, any stepwise variable selection methods has been combined with the linear model such as AIC and BIC.</p>
-<p>When we calculate the mse of each model we select, cross validation has been applied to avoid outfitting. Thus, we should focus on whether the mse value of these models are same or deviating from each other since there will be a fluctuation in each time we calculate.</p>
+<p>When we calculate the mse of each model we select, cross validation has been applied to avoid outfitting. Thus, we should focus on whether the mse value of these models are the same or deviating from each other since there will be a fluctuation in each time we calculate.</p>
 
 </div>
 </div>
@@ -13156,9 +13172,9 @@ To be specific, any stepwise variable selection methods has been combined with t
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Model-Diagnostics">Model Diagnostics<a class="anchor-link" href="#Model-Diagnostics">&#182;</a></h1><p>After fitting the model, we need to exam the normality of the residual and if there exist any pattern.
-<img src="images\diagnostic_after_model.jpg" width=360, height = 240>
-Apparently, there is no significant pattern among those plots, and the normality of the residual can be guaranteed. The As for the Homoscedasticity and Influential points, there no significant points showing in the plot. Thus we can accept the fitted model.</p>
+<h1 id="3-Model-Diagnostics">3 Model Diagnostics<a class="anchor-link" href="#3-Model-Diagnostics">&#182;</a></h1><p>After fitting the model, we need to exam the normality of the residual and if there exist any pattern.
+<img src="images\diagnostic_after_model.jpg" width=560, height = 240>
+Apparently, there is no significant pattern among those plots, and the normality of the residual can be guaranteed. As for the Homoscedasticity and Influential points, there are no significant points showing in the plot. Thus we can accept the fitted model.</p>
 
 </div>
 </div>
@@ -13166,7 +13182,7 @@ Apparently, there is no significant pattern among those plots, and the normality
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h1><h4 id="Advantage:">Advantage:<a class="anchor-link" href="#Advantage:">&#182;</a></h4><p><strong>1.Rule of Thumb:</strong> The model we use only include two variables, which it is easy for test person to acquire its bodyfat percentage quickly.</p>
+<h1 id="4-Conclusion">4 Conclusion<a class="anchor-link" href="#4-Conclusion">&#182;</a></h1><h4 id="Advantage:">Advantage:<a class="anchor-link" href="#Advantage:">&#182;</a></h4><p><strong>1.Rule of Thumb:</strong> The model we use only includes two variables, which is easy for test person to acquire its bodyfat percentage quickly.</p>
 <p><strong>2.Simplicity:</strong> The model only uses around 250 data to build a linear model, which is easy to handle for a modern computer.</p>
 <h4 id="Disadvantage:">Disadvantage:<a class="anchor-link" href="#Disadvantage:">&#182;</a></h4><p><strong>1.Not a well-founded model</strong> This model is founded by about 250 person, which can hardly represent all of human since there might be some differences among different district.</p>
 <p><strong>2.Measurement error:</strong> Since the abdomen has been included in the model, it is easily to be measured incorrectly for normal people.</p>
@@ -13177,7 +13193,7 @@ Apparently, there is no significant pattern among those plots, and the normality
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Contribution">Contribution<a class="anchor-link" href="#Contribution">&#182;</a></h1><p>Hao Qin: BeSS model building, slide editing, jupytor file editing and pdf summary editing</p>
+<h1 id="5-Contribution">5 Contribution<a class="anchor-link" href="#5-Contribution">&#182;</a></h1><p>Hao Qin: BeSS model building, slide editing, jupytor file editing and pdf summary editing</p>
 <p>Qiaoyu Wang: Analyzing data with Mallow's Cp and Adjusted R square, integrating the ipynb and check the assumption by model diagnosis.</p>
 <p>Jiacheng Mao: Set up Lasso model and Shinny App</p>
 <p>Yuhan Meng: Data Cleaning, slide making, using stepwise variables selection model buidling method and drawing diagnostic plots</p>
@@ -13188,7 +13204,7 @@ Apparently, there is no significant pattern among those plots, and the normality
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Reference">Reference<a class="anchor-link" href="#Reference">&#182;</a></h1><p>Centers for Disease Control and Prevention. (2011). Body mass index: considerations for practitioners. Cdc [Internet], 1-4.</p>
+<h1 id="6-Reference">6 Reference<a class="anchor-link" href="#6-Reference">&#182;</a></h1><p>Centers for Disease Control and Prevention. (2011). Body mass index: considerations for practitioners. Cdc [Internet], 1-4.</p>
 <p>Fuller, N. J., &amp; Elia, M. (1990). Calculation of body fat in the obese by Siri's formula. European journal of clinical nutrition, 44(2), 165.</p>
 <p>Wen, C., Zhang, A., Quan, S., &amp; Wang, X. (2017). BeSS: An R Package for Best Subset Selection in Linear, Logistic and CoxPH Models. arXiv preprint arXiv:1709.06254.</p>
 
