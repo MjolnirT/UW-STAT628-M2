@@ -13131,7 +13131,15 @@ thus, it is easy for us to detect them through graphics.</p>
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Variable-Selection-and-Model-Fitting">Variable Selection and Model Fitting<a class="anchor-link" href="#Variable-Selection-and-Model-Fitting">&#182;</a></h1><p>In this part, several methods have been applied, including stepwise aic and bic selection, lasso, mallow’s cp and Bess, which is a new proposed way to selecting variables. After applying these methods, since the total sample size is not large, we can use cross validation to measure the performance of each method, to decide which component should be treated as the independent variable in the final model. To be specific, the final model should be as a rule of thumb, which requires that the quantity of the independent variables should not exceed four.</p>
-<p><img src="images\comparison_between_models.png" width=650, height = 230></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="images\comparison_between_models.png" width=650, height = 230>
+To be specific, any stepwise variable selection methods has been combined with the linear model such as AIC and BIC.</p>
 <p>When we calculate the mse of each model we select, cross validation has been applied to avoid outfitting. Thus, we should focus on whether the mse value of these models are same or deviating from each other since there will be a fluctuation in each time we calculate.</p>
 
 </div>
@@ -13150,7 +13158,7 @@ thus, it is easy for us to detect them through graphics.</p>
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Model-Diagnostics">Model Diagnostics<a class="anchor-link" href="#Model-Diagnostics">&#182;</a></h1><p>After fitting the model, we need to exam the normality of the residual and if there exist any pattern.
 <img src="images\diagnostic_after_model.jpg" width=360, height = 240>
-Apparently, there is no significant pattern among those plots, and the normality of the residual can be guaranteed. Thus we can accept the fitted model.</p>
+Apparently, there is no significant pattern among those plots, and the normality of the residual can be guaranteed. The As for the Homoscedasticity and Influential points, there no significant points showing in the plot. Thus we can accept the fitted model.</p>
 
 </div>
 </div>
@@ -13158,8 +13166,18 @@ Apparently, there is no significant pattern among those plots, and the normality
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h1><h4 id="Advantage:">Advantage:<a class="anchor-link" href="#Advantage:">&#182;</a></h4><p><strong>1.Simplicity.</strong> The model we use only include two variables, which it is easy for test person to acquire its bodyfat percentage quickly.</p>
-<h4 id="Disadvantage:">Disadvantage:<a class="anchor-link" href="#Disadvantage:">&#182;</a></h4><p><strong>1.not a well-founded model</strong></p>
+<h1 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h1><h4 id="Advantage:">Advantage:<a class="anchor-link" href="#Advantage:">&#182;</a></h4><p><strong>1.Rule of Thumb:</strong> The model we use only include two variables, which it is easy for test person to acquire its bodyfat percentage quickly.</p>
+<p><strong>2.Simplicity:</strong> The model only uses around 250 data to build a linear model, which is easy to handle for a modern computer.</p>
+<h4 id="Disadvantage:">Disadvantage:<a class="anchor-link" href="#Disadvantage:">&#182;</a></h4><p><strong>1.not a well-founded model</strong> This model is founded by about 250 person, which can hardly represent all of human since there might be some differences among different district.</p>
+<p><strong>2.Measurement error:</strong> Since the abdomen has been included in the model, it is easily to be measured incorrectly for normal people.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Contribution">Contribution<a class="anchor-link" href="#Contribution">&#182;</a></h1><p>Hao Qin: BeSS model building, slide editing, jupytor file editing and pdf summary editing</p>
 
 </div>
 </div>
