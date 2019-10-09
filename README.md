@@ -1,8 +1,8 @@
 # Bodyfat Analysis
-##Author
+## Author
 Group 7:Hao Qin, Jiacheng Mao, Qiaoyu Wang, Yuhan Meng
 
-##Motivation
+## Motivation
 Nowadays,health becomes a prevalent topic around world. People pay more attention on their bodyfat percentage which is a measurement to evaluate their healthy condition. However,it is inconvenient to get an accurate bodyfat percentage in the daily life. Hence our group would like to find a simple,robust and aslo accurate way to estimate the bodyfat. Our analysis based on a real data set contains 252 males and their common body measurements.
 
 
