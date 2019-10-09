@@ -13077,10 +13077,10 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><h1 style="text-align:center">Title </h1></p>
-<h4 style="text-align:right">Hao Qin, Qiaoyu Wang, Yuhan Meng </h4><h1 id="1.Introduction">1.Introduction<a class="anchor-link" href="#1.Introduction">&#182;</a></h1><p>Nowadays, the  physical health has become a serious concern in the modern society since excess storage of fat will lead to a variety range of disease and highly leave up the risk of coronary heart disease. To measure the fat of person, we also have developed several methods, including BMI index, which is the quotient of weight divided by height squared. 
+<p><h1 style="text-align:center">A easy way to get Bodyfat </h1></p>
+<h4 style="text-align:right">Hao Qin, Jiacheng Mao, Qiaoyu Wang, Yuhan Meng </h4><h1 id="1.Introduction">1.Introduction<a class="anchor-link" href="#1.Introduction">&#182;</a></h1><p>Nowadays, the  physical health has become a serious concern in the modern society since excess storage of fat will lead to a variety range of disease and highly leave up the risk of coronary heart disease. To measure the fat of person, we also have developed several methods, including BMI index, which is the quotient of weight divided by height squared. 
 In this article, we develop a sample method to measure the bodyfat percentage of one person, which only requires few easily accessible variables.</p>
-<h2 id="1.1Outliers-Detection">1.1Outliers Detection<a class="anchor-link" href="#1.1Outliers-Detection">&#182;</a></h2><p>The data we have is BodyFat.csv file which includes <strong>253</strong> persons physical data in total <strong>17</strong> variables. In order to use these data to build the model, we use three different types of methods to detect not only the outliers, but also the influence points in the original dataset, 
+<h2 id="1.1-Outliers-Detection">1.1 Outliers Detection<a class="anchor-link" href="#1.1-Outliers-Detection">&#182;</a></h2><p>The data we have is BodyFat.csv file which includes <strong>253</strong> persons physical data in total <strong>17</strong> variables. In order to use these data to build the model, we use three different types of methods to detect not only the outliers, but also the influence points in the original dataset, 
 which is Siri's equation, BMI formula and cook's distance. Those points will deviate from the line or the region on which most points are, 
 thus, it is easy for us to detect them through graphics.</p>
 <h3 id="Siri's-equation">Siri's equation<a class="anchor-link" href="#Siri's-equation">&#182;</a></h3>$$ \text{Percentage of Body Fat} = \dfrac{495}{\text{Body Density(gm/cm^3)}} - 450$$<h3 id="BMI-equation">BMI equation<a class="anchor-link" href="#BMI-equation">&#182;</a></h3>$$ \text{BMI} = \dfrac{\text{weight}}{\text{hight}^2} $$<h3 id="Data-Diagnosis">Data Diagnosis<a class="anchor-link" href="#Data-Diagnosis">&#182;</a></h3>
@@ -13168,7 +13168,7 @@ Apparently, there is no significant pattern among those plots, and the normality
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h1><h4 id="Advantage:">Advantage:<a class="anchor-link" href="#Advantage:">&#182;</a></h4><p><strong>1.Rule of Thumb:</strong> The model we use only include two variables, which it is easy for test person to acquire its bodyfat percentage quickly.</p>
 <p><strong>2.Simplicity:</strong> The model only uses around 250 data to build a linear model, which is easy to handle for a modern computer.</p>
-<h4 id="Disadvantage:">Disadvantage:<a class="anchor-link" href="#Disadvantage:">&#182;</a></h4><p><strong>1.not a well-founded model</strong> This model is founded by about 250 person, which can hardly represent all of human since there might be some differences among different district.</p>
+<h4 id="Disadvantage:">Disadvantage:<a class="anchor-link" href="#Disadvantage:">&#182;</a></h4><p><strong>1.Not a well-founded model</strong> This model is founded by about 250 person, which can hardly represent all of human since there might be some differences among different district.</p>
 <p><strong>2.Measurement error:</strong> Since the abdomen has been included in the model, it is easily to be measured incorrectly for normal people.</p>
 
 </div>
@@ -13178,7 +13178,9 @@ Apparently, there is no significant pattern among those plots, and the normality
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Contribution">Contribution<a class="anchor-link" href="#Contribution">&#182;</a></h1><p>Hao Qin: BeSS model building, slide editing, jupytor file editing and pdf summary editing</p>
-<p>QIaoyu Wang: Analyzing data with Mallow's Cp and Adjusted R square, integrating the ipynb and check the assumption by model diagnosis.</p>
+<p>Qiaoyu Wang: Analyzing data with Mallow's Cp and Adjusted R square, integrating the ipynb and check the assumption by model diagnosis.</p>
+<p>Jiacheng Mao: Set up Lasso model and Shinny App</p>
+<p>Yuhan Meng: Data Cleaning, slide making, using stepwise variables selection model buidling method and drawing diagnostic plots</p>
 
 </div>
 </div>
@@ -13186,7 +13188,10 @@ Apparently, there is no significant pattern among those plots, and the normality
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Reference">Reference<a class="anchor-link" href="#Reference">&#182;</a></h1>
+<h1 id="Reference">Reference<a class="anchor-link" href="#Reference">&#182;</a></h1><p>Centers for Disease Control and Prevention. (2011). Body mass index: considerations for practitioners. Cdc [Internet], 1-4.</p>
+<p>Fuller, N. J., &amp; Elia, M. (1990). Calculation of body fat in the obese by Siri's formula. European journal of clinical nutrition, 44(2), 165.</p>
+<p>Wen, C., Zhang, A., Quan, S., &amp; Wang, X. (2017). BeSS: An R Package for Best Subset Selection in Linear, Logistic and CoxPH Models. arXiv preprint arXiv:1709.06254.</p>
+
 </div>
 </div>
 </div>
