@@ -37,19 +37,19 @@ The cleaningdata.csv contains 248 male observations and some values of measures 
 ## Code
 This folder contains all the code we used to complete the analysis. It includes:
 
-**cleaning_data.R :** 			data cleaning
+**cleaning_data.R :**   data cleaning 
 
 **diagnostic.R & ggplot.R:** plot diagnostic graphics for detecting outliers and influence points
 
-**Crossvalidation.R :**		   Defining the function used for cross validation
+**Crossvalidation.R :**  Defining the function used for cross validation
 
-**AIC_BIC.ipynb & AIC_BIC.R:**
+**AIC_BIC.ipynb & AIC_BIC.R:**  Using stepwise variable selection method to build model
 
 **Adjusted r square.ipynb & Adjusted r square.R :**  Using adjusted r squared criterion to build model
 
 **Mallow's cp.R & Mallow's cp.ipynb:** Using Mallow's cp criterion to fit the model
 
-**Lasso_Elastic_Net.R :**     Using Lasso and elastic net to fit the model
+**Lasso_Elastic_Net.R :**   Using Lasso and elastic net to fit the model
 
 **BeSS.ipynb:** Using BeSS method to select variables and fit model                 
 
@@ -59,3 +59,4 @@ This folder contains all the figures and tables we produced in our analysis.
 
 ## Shiny
 link:
+
