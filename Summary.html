@@ -13078,7 +13078,7 @@ div#notebook {
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><h1 style="text-align:center">Title </h1></p>
-<h4 style="text-align:right">Hao Qin, Qiaoyu Wang, Yuhan Meng </h4><h1 id="1.Introduction">1.Introduction<a class="anchor-link" href="#1.Introduction">&#182;</a></h1><p>Nowadays, the people physical health has become a serious concern since excess storage of fat will lead to a variety range of disease and highly leave up the risk of coronary heart disease. To measure the fat of person, we also have developed several methods, including BMI index, which is the quotient of weight divided by height squared. 
+<h4 style="text-align:right">Hao Qin, Qiaoyu Wang, Yuhan Meng </h4><h1 id="1.Introduction">1.Introduction<a class="anchor-link" href="#1.Introduction">&#182;</a></h1><p>Nowadays, the  physical health has become a serious concern in the modern society since excess storage of fat will lead to a variety range of disease and highly leave up the risk of coronary heart disease. To measure the fat of person, we also have developed several methods, including BMI index, which is the quotient of weight divided by height squared. 
 In this article, we develop a sample method to measure the bodyfat percentage of one person, which only requires few easily accessible variables.</p>
 <h2 id="1.1Outliers-Detection">1.1Outliers Detection<a class="anchor-link" href="#1.1Outliers-Detection">&#182;</a></h2><p>The data we have is BodyFat.csv file which includes <strong>253</strong> persons physical data in total <strong>17</strong> variables. In order to use these data to build the model, we use three different types of methods to detect not only the outliers, but also the influence points in the original dataset, 
 which is Siri's equation, BMI formula and cook's distance. Those points will deviate from the line or the region on which most points are, 
@@ -13148,7 +13148,7 @@ To be specific, any stepwise variable selection methods has been combined with t
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>From Table 2, there is no significant difference in Mean squared error among those different methods except the situation of one variable. Considering the rule of thumb, we decide to choose a model within two variables, which is not a heavy sacrifice in accuracy. The variables we select are weight and abdomen, applied in the sample linear model.</p>
+<p>From Table 3, there is no significant difference in Mean squared error among those different methods except the situation of one variable. Considering the rule of thumb, we decide to choose a model within two variables, which is not a heavy sacrifice in accuracy. The variables we select are weight and abdomen, applied in the sample linear model.</p>
 
 </div>
 </div>
@@ -13178,6 +13178,7 @@ Apparently, there is no significant pattern among those plots, and the normality
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Contribution">Contribution<a class="anchor-link" href="#Contribution">&#182;</a></h1><p>Hao Qin: BeSS model building, slide editing, jupytor file editing and pdf summary editing</p>
+<p>QIaoyu Wang: Analyzing data with Mallow's Cp and Adjusted R square, integrating the ipynb and check the assumption by model diagnosis.</p>
 
 </div>
 </div>
