@@ -22,10 +22,11 @@ cvlassofit$lambda.1se
 
 ### Get the R^2
 cvlassofit$glmnet.fit$dev.ratio[which(cvlassofit$glmnet.fit$lambda == cvlassofit$lambda.1se)]
+cvlassofit$cvm[which(cvlassofit$glmnet.fit$lambda == cvlassofit$lambda.1se)]
+
 
 
 ### Elastic net
-
 elastic_net_m = glmnet(as.matrix(data[,c(-1,-2,-3)]),data[,2],alpha = 0.5)
 elastic_net_m$lambda
 plot(elastic_net_m, label = T, xvar="lambda")
@@ -40,9 +41,6 @@ cv_elastic_netfit$lambda.1se
 
 ### Get the R^2
 cv_elastic_netfit$glmnet.fit$dev.ratio[which(cv_elastic_netfit$glmnet.fit$lambda == cv_elastic_netfit$lambda.1se)]
-
-
-
-
+cv_elastic_netfit$cvm[which(cv_elastic_netfit$glmnet.fit$lambda == cv_elastic_netfit$lambda.1se)]
 
 
