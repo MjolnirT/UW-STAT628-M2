@@ -48,19 +48,19 @@ bodyfat$BODYFAT[76]=fat
 #siri2
 revdes=1/bodyfat$DENSITY 
 frame1=data.frame(fat=bodyfat$BODYFAT[-c(182)],resd=revdes[-c(182)],n=num[-c(182)])
-p2 = ggplot(frame1, aes(x = resd, y =fat)) + geom_point( alpha=0.9,size=1)+
+p3 = ggplot(frame1, aes(x = resd, y =fat)) + geom_point( alpha=0.9,size=1)+
   geom_point(data = frame1, aes(x = max(resd), y=max(fat)), colour = 'red', size = 3) +
   labs(title="Siri's Equation", x="1/Density", y="Bodyfat")+theme(plot.title = element_text(hjust = 0.5))+
   annotate("text",x =frame1$resd, y = frame1$fat,label=ifelse(frame1$resd>1, frame1$n,""),vjust=2,color="red")
-p2
+p3
 
 
 #siri3
 revdes=1/bodyfat$DENSITY 
 frame1=data.frame(fat=bodyfat$BODYFAT[-c(182,216)],resd=revdes[-c(182,216)])
-p3 = ggplot(frame1, aes(x = resd, y =fat)) + geom_point( alpha=0.9,size=1)+
+p4 = ggplot(frame1, aes(x = resd, y =fat)) + geom_point( alpha=0.9,size=1)+
   labs(title="Siri's Equation", x="1/Density", y="Bodyfat")+theme(plot.title = element_text(hjust = 0.5))
-p3
+p4
 
 #bmi
 bmi=bodyfat$WEIGHT/(bodyfat$HEIGHT)^2
@@ -69,10 +69,10 @@ res=bodyfat$ADIPOSITY-estimate
 num=c(1:252)
 num1=num[-c(182,216)]
 frame1=data.frame(adip=bodyfat$ADIPOSITY[c(-182,-216)],b=bmi[c(-182,-216)],r=res[c(-182,-216)],n=num1)
-p3 = ggplot(frame1, aes(x = b, y =adip)) + geom_point( alpha=0.9,size=1)+
+p5 = ggplot(frame1, aes(x = b, y =adip)) + geom_point( alpha=0.9,size=1)+
   labs(title="BMI Equation", x="WEIGHT/(HEIGHT)^2", y="ADIPOSITY")+theme(plot.title = element_text(hjust = 0.5))+
   annotate("text",x=frame1$b,y=frame1$adip,label=ifelse(frame1$r>2 | frame1$r < -2, frame1$n,""),vjust=2,hjust = 1,color="red",size=3,angle = 45)
-p3
+p5
 
 #change values
 model.bmi=lm(bodyfat$ADIPOSITY[-c(42,163,221)]~bmi[-c(42,163,221)])
@@ -95,7 +95,18 @@ bodyfat$ADIPOSITY[163]=adi
 ##ggplot
 bmi=bodyfat$WEIGHT/(bodyfat$HEIGHT)^2
 frame1=data.frame(adip=bodyfat$ADIPOSITY[c(-182,-216)],b=bmi[c(-182,-216)],r=res[c(-182,-216)],n=num1)
-p3 = ggplot(frame1, aes(x = b, y =adip)) + geom_point( alpha=0.9,size=1)+
+p6 = ggplot(frame1, aes(x = b, y =adip)) + geom_point( alpha=0.9,size=1)+
   labs(title="BMI Equation", x="WEIGHT/(HEIGHT)^2", y="ADIPOSITY")+theme(plot.title = element_text(hjust = 0.5))+
   annotate("text",x=frame1$b,y=frame1$adip,label=ifelse(frame1$r>2 | frame1$r < -2, frame1$n,""),vjust=2,hjust = 1,color="red",size=3,angle = 45)
-p3
+p6
+
+library(magrittr)
+library(multipanelfigure)
+figure1 <- multi_panel_figure(columns = 2, rows = 2, panel_label_type = "none") 
+figure1 %<>%
+  fill_panel(p1, column = 1, row = 1) %<>%
+  fill_panel(p2, column = 2, row = 1) %<>%
+  fill_panel(p3, column = 1, row = 2) %<>%
+  fill_panel(p4, column = 2, row = 2) 
+figure1 
+
