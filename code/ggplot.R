@@ -106,7 +106,7 @@ figure1 <- multi_panel_figure(columns = 2, rows = 2, panel_label_type = "none")
 figure1 %<>%
   fill_panel(p1, column = 1, row = 1) %<>%
   fill_panel(p2, column = 2, row = 1) %<>%
-  fill_panel(p3, column = 1, row = 2) %<>%
-  fill_panel(p4, column = 2, row = 2) 
+  fill_panel(p5, column = 1, row = 2) %<>%
+  fill_panel(p6, column = 2, row = 2) 
 figure1 
 
