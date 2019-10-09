@@ -4,7 +4,7 @@
 library(glmnet)
 
 ### Data Path
-data = read.csv("/Users/michael/Desktop/Fall_2019/Stat_628/Module2/clean_dataset.csv")
+data = read.csv("C:/Users/Tansu/Documents/GitHub/UW-STAT628-M2/dataset/clean dataset.csv")
 
 ### Lasso
 lasso_m = glmnet(as.matrix(data[,c(-1,-2,-3)]),data[,2],alpha = 1)

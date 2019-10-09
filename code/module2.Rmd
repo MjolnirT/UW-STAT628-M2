@@ -18,10 +18,16 @@ library(knitr)
 library(carData)
 library(plyr)
 library(stringr)
-#setwd(paste0(strsplit(getwd(),split = "/code"), "/dataset"))
+setwd(paste0(strsplit(getwd(),split = "/code"), "/dataset"))
 bodyfat=read.csv('BodyFat.csv')
 #boxplot(bodyfat)
 ```
+
+
+
+### residual plot of Siri's equation, BMI 
+
+
 
 ## 2.Detection of the outliers and their treatment 
 
@@ -260,8 +266,52 @@ plot(x=8:1,cp_cv,xlab = "number of variavbles",ylab="Mean square error",type = "
 plot(x=1:8,y=g1$Cp[1:8],xlab = "number of variavbles",ylab="Mallow's cp",type = "b",main = "Cp vs # of variables")
 ```
 
-```{r}
-#lasso and group lasso
+```{r, echo = FALSE, warning = FALSE, message=FALSE}
+###
+### Lasso in this model
+
+library(glmnet)
+
+### Data Path
+data = read.csv("C:/Users/Tansu/Documents/GitHub/UW-STAT628-M2/dataset/clean dataset.csv")
+
+### Lasso
+lasso_m = glmnet(as.matrix(data[,c(-1,-2,-3)]),data[,2],alpha = 1)
+
+lasso_m$lambda
+coef(lasso_m,xvar="lambda")
+plot(lasso_m, label = T, xvar="lambda")
+
+cvlassofit = cv.glmnet(as.matrix(data[,c(-1,-2,-3)]),data[,2],alpha = 1)
+plot(cvlassofit)
+### The variable we selected
+coef(cvlassofit, s = "lambda.1se")
+## The lambda we are choosing
+cvlassofit$lambda.1se
+
+### Get the R^2
+cvlassofit$glmnet.fit$dev.ratio[which(cvlassofit$glmnet.fit$lambda == cvlassofit$lambda.1se)]
+cvlassofit$cvm[which(cvlassofit$glmnet.fit$lambda == cvlassofit$lambda.1se)]
+
+
+
+### Elastic net
+elastic_net_m = glmnet(as.matrix(data[,c(-1,-2,-3)]),data[,2],alpha = 0.5)
+elastic_net_m$lambda
+plot(elastic_net_m, label = T, xvar="lambda")
+
+cv_elastic_netfit = cv.glmnet(as.matrix(data[,c(-1,-2,-3)]),data[,2],alpha = 1)
+plot(cv_elastic_netfit )
+### The variable we selected
+coef(cv_elastic_netfit , s = "lambda.1se")
+## The lambda we are choosing
+cv_elastic_netfit$lambda.1se
+
+
+### Get the R^2
+cv_elastic_netfit$glmnet.fit$dev.ratio[which(cv_elastic_netfit$glmnet.fit$lambda == cv_elastic_netfit$lambda.1se)]
+cv_elastic_netfit$cvm[which(cv_elastic_netfit$glmnet.fit$lambda == cv_elastic_netfit$lambda.1se)]
+
 ```
 
 ```{r,echo = FALSE, warning = FALSE, message=FALSE, fig.height = 2, fig.width = 7}
@@ -334,18 +384,19 @@ mse_bess_3_cv = mean(mse_bess_3/(length(total[,1])-82*2))
 
 
 ```{r,echo = FALSE, warning = FALSE, message=FALSE}
-table2 <- data.frame(model = c(rep('BIC', 4), rep('Mallow\'s Cp', 4), rep('Adjusted R square', 4), rep('BeSS', 3)),
+table2 <- data.frame(model = c(rep('BIC', 4), rep('Mallow\'s Cp', 4), rep('Adjusted R square', 4), rep('BeSS', 3), 'LASSO'),
                      Mean_Sq = c(bic_cv1, bic_cv2, bic_cv3, bic_cv4, 
                                  cp7_cv, cp6_cv, cp5_cv, cp4_cv, 
                                  adjr28_cv, adjr27_cv, adjr26_cv, adjr25_cv,
-                                 mse_bess_3_cv, mse_bess_4_cv, mse_bess_5_cv),
+                                 mse_bess_3_cv, mse_bess_4_cv, mse_bess_5_cv,
+                                 cvlassofit$cvm[which(cvlassofit$glmnet.fit$lambda == cvlassofit$lambda.1se)]),
                      variables = c('WEIGHT + ABDOMEN + WRIST', 'WEIGHT + ABDOMEN', 'WEIGHT', 'ABDOMEN', 
                                    'ABDOMEN', 'WEIGHT + ABDOMEN', 'WEIGHT + ABDOMEN + WRIST', 'WEIGHT + ABDOMEN + BICEPS + WRIST', 
                                    'ABDOMEN', 'WEIGHT + ABDOMEN', 'WEIGHT + ABDOMEN +  WRIST', 'WEIGHT + ABDOMEN + BICEPS + WRIST',
-                                   'HEIGHT + CHEST + ABDOMEN', 'ADIPOSITY + CHEST + ABDOMEN + HIP ', 'WEIGHT + ADIPOSITY + CHEST + ABDOMEN + WRIST'
+                                   'HEIGHT + CHEST + ABDOMEN', 'ADIPOSITY + CHEST + ABDOMEN + HIP ', 'WEIGHT + ADIPOSITY + CHEST + ABDOMEN + WRIST',
+                                   'HEIGHT + AGE + ABDOMEN + WRIST'
                                    ))
-table2  = table2[order(table2$Mean_Sq),]
-kable(table2, caption = "Different methods with multiple choices of variables")
+kable(table2[order(table2$Mean_Sq),], caption = "Different methods with multiple choices of variables")
 ```
 
 ## 4.Model building

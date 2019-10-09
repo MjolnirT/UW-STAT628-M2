@@ -1,4 +1,6 @@
 require(ggplot2)
+Dir = dirname(rstudioapi::getSourceEditorContext()$path)
+setwd(paste0(strsplit(Dir,split = "/code"), "/dataset"))
 cleanbodyfat=read.csv("clean dataset.csv")
 model=lm(cleanbodyfat[,2]~cleanbodyfat[,5]+cleanbodyfat[,10])
 model=lm(BODYFAT~ ., data=cleanbodyfat[,c(-1,-3)])

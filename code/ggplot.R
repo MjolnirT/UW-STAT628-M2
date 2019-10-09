@@ -1,5 +1,7 @@
 rm(list=ls())
-setwd('/Users/apple/Documents/Wisc/study/2019Fall/STAT 628/Module2')
+library(ggplot2)
+Dir = dirname(rstudioapi::getSourceEditorContext()$path)
+setwd(paste0(strsplit(Dir,split = "/code"), "/dataset"))
 bodyfat=read.csv('BodyFat.csv')
 
 ##boxplot
